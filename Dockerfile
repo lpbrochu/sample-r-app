@@ -1,5 +1,5 @@
 FROM r-base:latest
-COPY . /usr/local/src/myscripts
-WORKDIR /usr/local/src/myscripts
-#ENTRYPOINT ["Rscript"]
-
+ADD install_packages.R /install_packages.R
+RUN Rscript install_packages.R
+ADD ingest.R /ingest.R
+ENTRYPOINT ["Rscript"]

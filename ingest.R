@@ -2,20 +2,34 @@
 args = commandArgs(trailingOnly=TRUE)
 
 
-data = read.csv(paste0(args[1], "/", "cereals.csv"), header=T)
+library(readr)
+library(tidyr)
+library(dplyr)
 
-# Random sampling
-samplesize = 0.60 * nrow(data)
-set.seed(80)
-index = sample( seq_len ( nrow ( data ) ), size = samplesize )
+#flights <- read.csv("~/data/flights.csv", stringsAsFactors = F, na.strings = c("NA", ""))
+flights <- read.csv("/pfs/flights/flights.csv", stringsAsFactors = F, na.strings = c("NA", ""))
 
-# Create training and test set
-datatrain = data[ index, ]
-datatest = data[ -index, ]
+flights <- flights %>%
+  mutate(speed = dist / (time / 60))
 
+delays <- flights %>%
+    group_by(dest) %>%
+    summarise(mean = mean(dep_delay))
 
-max = apply(data , 2 , max)
-min = apply(data, 2 , min)
-scaled = as.data.frame(scale(data, center = min, scale = max - min))
+hourly <- flights %>%
+  filter(cancelled == 0) %>%
+  mutate(time = hour + minute / 60) %>%
+  group_by(time) %>%
+  summarise(
+    arr_delay = mean(arr_delay, na.rm = TRUE),
+    n = n()
+  )
 
-saveRDS(scaled, file=paste0(args[2], "/", "data.Rda"))
+full <- flights %>%
+  group_by(dest) %>%
+  filter(!is.na(arr_delay)) %>%
+  summarise(delay = mean(arr_delay)) %>%
+  arrange(desc(delay)) 
+
+#saveRDS(full, file="/home/lpbrochu/data-out/full.Rda")
+saveRDS(full, file="/pfs/out/full.Rda")
