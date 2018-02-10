@@ -7,7 +7,8 @@ library(tidyr)
 library(dplyr)
 
 #flights <- read.csv("~/data/flights.csv", stringsAsFactors = F, na.strings = c("NA", ""))
-flights <- read.csv("/pfs/flights/flights.csv", stringsAsFactors = F, na.strings = c("NA", ""))
+#flights <- read.csv("/pfs/flights/flights.csv", stringsAsFactors = F, na.strings = c("NA", ""))
+flights <- read.csv(paste0(args[1],"/","flights.csv"), stringsAsFactors = F, na.strings = c("NA", ""))
 
 flights <- flights %>%
   mutate(speed = dist / (time / 60))
@@ -32,4 +33,5 @@ full <- flights %>%
   arrange(desc(delay)) 
 
 #saveRDS(full, file="/home/lpbrochu/data-out/full.Rda")
-saveRDS(full, file="/pfs/out/full.Rda")
+#saveRDS(full, file="/pfs/out/full.Rda")
+saveRDS(full, file=paste0(args[2],"/","full.Rda"))
